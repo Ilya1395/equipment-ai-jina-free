@@ -6,6 +6,7 @@ import requests
 
 from .normalize import normalize_characteristic, normalize_unit, split_value_unit
 from .regex_extract import extract_by_regex
+from .text_utils import clean_text
 
 HF_API_URL = "https://api-inference.huggingface.co/models/{model}"
 DEFAULT_MODELS = {
@@ -17,7 +18,7 @@ DEFAULT_MODELS = {
 
 
 def _build_prompt(class_name: str, subclass_name: str, model_code: str, source_text: str) -> str:
-    source_text = source_text[:12000]
+    source_text = clean_text(source_text)[:14000]
     return f"""
 Ты извлекаешь технические характеристики оборудования из текста источника.
 
@@ -93,6 +94,7 @@ def extract_characteristics(
     model: str,
     hf_token: Optional[str] = None,
 ) -> List[Dict[str, str]]:
+    source_text = clean_text(source_text)
     # Сначала быстрый строгий парсер: он не требует токена и дает стабильный резерв.
     regex_items = extract_by_regex(source_text)
 
